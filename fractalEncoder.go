@@ -57,7 +57,7 @@ func makeImageColor(it int) color.Color {
 	if it == maxIterations {
 		return color.Black
 	}
-	return color.Gray{uint8(255 - int(contrast)*it)}
+	return color.Gray{uint8(255 - (float64(it) / float64(contrast) * 255))}
 }
 
 func makeImageData(escapeMatrix []int, width, height int) []color.Color {
