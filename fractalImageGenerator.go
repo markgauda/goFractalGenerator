@@ -57,7 +57,7 @@ func saveColorArrayAsImage(colorArray []color.Color, imageName, fileType string,
 func makeImage(imageName string) {
 	if imageName == "" {
 		var currentTime = time.Now()
-		imageName = fmt.Sprintf("fractalImage%d", currentTime.UnixMicro())
+		imageName = fmt.Sprintf("fractalImage x %.16f y %.16f %d", fractalData.centerX, fractalData.centerY, currentTime.UnixMicro())
 	}
 	saveColorArrayAsImage(RequestHandler(fractalData.centerX, fractalData.centerY, fractalData.zoomScale, imageWidth, imageHeight, IMAGE, MULTI_LINE, 16).imageData, imageName, "png", imageWidth, imageHeight)
 }
