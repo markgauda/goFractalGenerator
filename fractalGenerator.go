@@ -91,6 +91,19 @@ func getMinMax(point complex128, scale float64) (float64, float64, float64, floa
 	return xMin, xMax, yMin, yMax
 }
 
+func getMinMaxArbitraryPrecision(point arbPrecComplex, scale float64) (big.Float, big.Float, big.Float, big.Float) {
+	var xMax big.Float
+	var xMin big.Float
+	var yMax big.Float
+	var yMin big.Float
+
+	xMax.Add(big.NewFloat(scale/2), &point.real)
+	yMax.Add(big.NewFloat(scale/2), &point.imaginary)
+	xMin.Sub(&point.real, big.NewFloat(scale/2))
+	yMin.Sub(&point.imaginary, big.NewFloat(scale/2))
+	return xMin, xMax, yMin, yMax
+}
+
 //Generate the time to escape matrix in with a non-concurrent algorithm
 func generateFractalNotConcurrent(x, y, scale float64, width, height int) []int {
 	xmin, xmax, ymin, ymax := getMinMax(complex(x, y), scale)
@@ -151,5 +164,44 @@ func generateFractalLine(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin
 		x := float64(px)/float64(width)*(xmax-xmin) + xmin
 		z := complex(x, y)
 		escapeMatrix[px] = findTimeToEscape(z, maxIterations, escapeSize)
+	}
+}
+
+func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float64, width int, height int, threads int) []int {
+	var midpoint arbPrecComplex = arbPrecComplex{x, y}
+	var yMaxMinusyMin big.Float
+	xmin, xmax, ymin, ymax := getMinMaxArbitraryPrecision(midpoint, scale)
+
+	var escapeMatrix []int = make([]int, width*height)
+	var wg sync.WaitGroup
+	var workingThreads int = getWorkingThreads(height, threads)
+	var linesToGo int = height - workingThreads
+	var py int
+	for i := 0; linesToGo >= 0; i++ {
+		for j := 0; j < workingThreads; j++ {
+			yMaxMinusyMin.Sub(&ymax, &ymin)
+			y.Mul(big.NewFloat(float64(py/height)), &yMaxMinusyMin)
+			y.Add(&y, &ymin)
+			wg.Add(1)
+			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, y)
+			py++
+		}
+		wg.Wait()
+		workingThreads = getWorkingThreads(linesToGo, threads)
+		linesToGo -= workingThreads
+	}
+	return escapeMatrix
+}
+
+func generateFractalLineArbitraryPrecision(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin, xmax, y big.Float) {
+	defer wg.Done()
+	var xMaxMinusxMin big.Float
+	for px := 0; px < width; px++ {
+		var x big.Float
+		xMaxMinusxMin.Sub(&xmax, &xmin)
+		x.Mul(big.NewFloat(float64(px)/float64(width)), &xMaxMinusxMin)
+		x.Add(&x, &xmin) // := float64(px)/float64(width)*(xmax-xmin) + xmin
+		z := arbPrecComplex{x, y}
+		escapeMatrix[px] = findTimeToEscapeArbitraryPrecision(z, maxIterations, *big.NewFloat(escapeSize))
 	}
 }
