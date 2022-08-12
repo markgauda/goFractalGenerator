@@ -126,6 +126,8 @@ func (game *Game) Update() error {
 				imageScale -= 1
 				changeImageSize()
 			}
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyG) {
+			arbitraryPrecision = !arbitraryPrecision
 		}
 	}
 
