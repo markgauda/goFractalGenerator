@@ -10,6 +10,7 @@ Features I want to have are:
 package main
 
 import (
+	"math/big"
 	"math/cmplx"
 	"sync"
 )
@@ -61,6 +62,20 @@ func findTimeToEscape(coordinate complex128, iterations int, escapeSize float64)
 	for i := 0; i < iterations; i++ {
 		v = v*v + coordinate
 		if cmplx.Abs(v) > escapeSize {
+			return i
+		}
+	}
+	return maxIterations
+}
+
+func findTimeToEscapeArbitraryPrecision(coordinate arbPrecComplex, iterations int, escapeSize big.Float) int {
+	var v arbPrecComplex
+	var vAbs big.Float
+	for i := 0; i < iterations; i++ {
+		v = v.multiply(v)
+		v = v.add(coordinate)
+		vAbs = v.abs()
+		if vAbs.Cmp(&escapeSize) == 1 { //if v < escapseSize
 			return i
 		}
 	}
