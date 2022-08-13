@@ -185,13 +185,9 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 		for j := 0; j < workingThreads; j++ {
 			//y := float64(py)/float64(height)*(ymax-ymin) + ymin
 			yMaxMinusyMin.Sub(&ymax, &ymin)
-			println(yMaxMinusyMin.Text('f', 10))
 			pyOverheight.Set(big.NewFloat(float64(py) / float64(height)))
-			println(pyOverheight.Text('f', 10))
 			y.Mul(&pyOverheight, &yMaxMinusyMin)
-			println(y.Text('f', 10))
 			y.Add(&y, &ymin)
-			println(y.Text('f', 10))
 			wg.Add(1)
 			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, y)
 			py++
