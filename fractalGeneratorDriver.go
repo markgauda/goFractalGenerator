@@ -14,7 +14,7 @@ var threads int
 var contrast float64 = 8
 var imageScale = 2
 var imageWidth, imageHeight int
-var arbitraryPrecision bool = true
+var arbitraryPrecision bool = false
 
 type requestReturnData struct {
 	gameScreen []byteColor
