@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	var sizeFlag = flag.Int("size", 1000, "This is the number of pixels that make the screen")
+	var sizeFlag = flag.Int("size", 256, "This is the number of pixels that make the screen")
 	var threadsFlag = flag.Int("threads", 16, "This is the number of threads to use when generating an image.")
 	var midpointXFlag = flag.Float64("midpointX", 0, "The x value for midpoint to zoom in on, used for multi image zooms")
 	var midpointYFlag = flag.Float64("midpointY", 0, "The y value for midpoint to zoom in on, used for multi image zooms")
