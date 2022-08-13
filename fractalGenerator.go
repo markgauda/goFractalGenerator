@@ -38,7 +38,11 @@ func RequestHandler(x, y, scale float64, width, heigth, send, concurrent, thread
 		if threads < 1 {
 			threads = 1
 		}
-		escapeMatrix = generateFractalLineConcurrent(x, y, scale, width, heigth, threads)
+		if !arbitraryPrecision {
+			escapeMatrix = generateFractalLineConcurrent(x, y, scale, width, heigth, threads)
+		} else {
+			escapeMatrix = generateFractalLineConcurrentArbitraryPrecision(*big.NewFloat(x), *big.NewFloat(y), scale, width, heigth, threads)
+		}
 	}
 	if send == GAME_WINDOW {
 		//send escapeMatrix to encoder for game window
@@ -169,7 +173,7 @@ func generateFractalLine(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin
 
 func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float64, width int, height int, threads int) []int {
 	var midpoint arbPrecComplex = arbPrecComplex{x, y}
-	var yMaxMinusyMin big.Float
+	var yMaxMinusyMin, pyOverheight big.Float
 	xmin, xmax, ymin, ymax := getMinMaxArbitraryPrecision(midpoint, scale)
 
 	var escapeMatrix []int = make([]int, width*height)
@@ -179,9 +183,15 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 	var py int
 	for i := 0; linesToGo >= 0; i++ {
 		for j := 0; j < workingThreads; j++ {
+			//y := float64(py)/float64(height)*(ymax-ymin) + ymin
 			yMaxMinusyMin.Sub(&ymax, &ymin)
-			y.Mul(big.NewFloat(float64(py/height)), &yMaxMinusyMin)
+			println(yMaxMinusyMin.Text('f', 10))
+			pyOverheight.Set(big.NewFloat(float64(py) / float64(height)))
+			println(pyOverheight.Text('f', 10))
+			y.Mul(&pyOverheight, &yMaxMinusyMin)
+			println(y.Text('f', 10))
 			y.Add(&y, &ymin)
+			println(y.Text('f', 10))
 			wg.Add(1)
 			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, y)
 			py++
