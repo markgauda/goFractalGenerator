@@ -41,6 +41,8 @@ var maxIterations int = 200
 
 var escapeSize float64 = 4
 
+var showDebugInfo = false
+
 //func MakeFractalImage()
 
 func setSize(size int) {
