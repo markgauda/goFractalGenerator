@@ -5,11 +5,18 @@ This is the package that can generate fractal time to escape matricies
 Features I want to have are:
 	-Time to escape matrix generator
 	-Concurrentcy
+
+Known bugs
+	-It appears that the arbitrary precision generator does not update
+	the y value between thread groups, this causes an blocky look. This
+	seems to be caused by a bug where a value is not being correctly
+	passed into a function
 */
 
 package main
 
 import (
+	"fmt"
 	"math/big"
 	"math/cmplx"
 	"sync"
@@ -173,8 +180,9 @@ func generateFractalLine(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin
 
 func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float64, width int, height int, threads int) []int {
 	var midpoint arbPrecComplex = arbPrecComplex{x, y}
-	var yMaxMinusyMin, pyOverheight big.Float
+	var yMaxMinusyMin, pyOverheight, intermediateMultiplication big.Float
 	xmin, xmax, ymin, ymax := getMinMaxArbitraryPrecision(midpoint, scale)
+	yMaxMinusyMin = *yMaxMinusyMin.Sub(&ymax, &ymin)
 
 	var escapeMatrix []int = make([]int, width*height)
 	var wg sync.WaitGroup
@@ -184,14 +192,16 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 	for i := 0; linesToGo >= 0; i++ {
 		for j := 0; j < workingThreads; j++ {
 			//y := float64(py)/float64(height)*(ymax-ymin) + ymin
-			yMaxMinusyMin = *yMaxMinusyMin.Sub(&ymax, &ymin)
+			//yMaxMinusyMin = *yMaxMinusyMin.Sub(&ymax, &ymin)
 			pyOverheight.Set(big.NewFloat(float64(py) / float64(height)))
-			y = *y.Mul(&pyOverheight, &yMaxMinusyMin)
-			y = *y.Add(&y, &ymin)
+			intermediateMultiplication = *intermediateMultiplication.Mul(&pyOverheight, &yMaxMinusyMin)
+			y = *y.Add(&intermediateMultiplication, &ymin)
+			fmt.Printf("out, %s ", y.Text('f', 10)) //debug
 			wg.Add(1)
 			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, y)
 			py++
 		}
+		fmt.Printf("\n") //debug
 		wg.Wait()
 		workingThreads = getWorkingThreads(linesToGo, threads)
 		linesToGo -= workingThreads
@@ -201,6 +211,7 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 
 func generateFractalLineArbitraryPrecision(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin, xmax, y big.Float) {
 	defer wg.Done()
+	fmt.Printf("in, %s ", y.Text('f', 10)) //debug
 	var xMaxMinusxMin big.Float
 	for px := 0; px < width; px++ {
 		var x big.Float
