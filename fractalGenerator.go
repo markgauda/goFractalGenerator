@@ -7,10 +7,17 @@ Features I want to have are:
 	-Concurrentcy
 
 Known bugs
-	-It appears that the arbitrary precision generator does not update
-	the y value between thread groups, this causes an blocky look. This
-	seems to be caused by a bug where a value is not being correctly
-	passed into a function
+	-It appears that the arbitrary precision generator does not pass
+	the y value to the concurrent line generator function reliably.
+	Adding a dely of 5ms between the update of the y value and the
+	passing of the y value makes the bug much less noticable. I'm
+	guessing this is an issue with my implimentation of concurrency
+	-Some of the lines are out of place in the final image, I'm guessing
+	there is some logic error that gives the line generator the wrong y
+	coordinate, because whole lines on the y axis are out of order.
+	-Prining the value of some big.Float numbers causes a panic I have
+	not yet determined what about these pareticular numbers causes the panic
+	but the panic has always been due to an index out of bounds error
 */
 
 package main

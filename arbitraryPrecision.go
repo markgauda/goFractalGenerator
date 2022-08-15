@@ -3,8 +3,10 @@ This program was created by Mark Gauda in the Summer of 2022
 This file will implement arbitrary precision complex numbers
 
 Current known bugs:
-	-It looks like the multiplication and absolute value functions
-	both panic when they are given -0
+	-The panic error message in absolute value
+	and multiplication has most often been an index
+	out of bounds error because one of the
+	big.float numbers somehow has a length of zero
 	-Addition will sometimes have an underflow error
 */
 
