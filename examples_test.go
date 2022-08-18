@@ -12,7 +12,6 @@ import (
 	"testing"
 )
 
-/*
 func ExampleGame() {
 	main()
 
@@ -20,7 +19,6 @@ func ExampleGame() {
 	//Output:
 	//test
 }
-*/
 
 func TestArbitraryPrecision(t *testing.T) {
 	var left, right, answer arbPrecComplex
@@ -52,6 +50,22 @@ func TestArbitraryPrecision(t *testing.T) {
 		t.Error("Adding Failed, (2+2i) * (2+2i) != " + fmt.Sprintf("%s+%si", answer.real.Text('f', 10), answer.imaginary.Text('f', 10)))
 	}
 	//println(answer.real.Text('f', 10), "+", answer.imaginary.Text('f', 10), "i")
+
+	left.real.Set(big.NewFloat(2))
+	left.imaginary.Set(big.NewFloat(-0))
+	right.real.Set(big.NewFloat(2))
+	right.imaginary.Set(big.NewFloat(-0))
+	answer = left.add(right)
+	answer.print()
+	if answer.real.Cmp(big.NewFloat(4)) != 0 || answer.imaginary.Cmp(big.NewFloat(0)) != 0 {
+		t.Error("Adding Failed, (2+0i) + (2+0i) != " + fmt.Sprintf("%s+%si", answer.real.Text('f', 10), answer.imaginary.Text('f', 10)))
+	}
+	//println(answer.real.Text('f', 10), "+", answer.imaginary.Text('f', 10), "i")
+	answer = left.multiply(right)
+	answer.print()
+	if answer.real.Cmp(big.NewFloat(4)) != 0 || answer.imaginary.Cmp(big.NewFloat(0)) != 0 {
+		t.Error("Adding Failed, (2+0i) * (2+0i) != " + fmt.Sprintf("%s+%si", answer.real.Text('f', 10), answer.imaginary.Text('f', 10)))
+	}
 
 	//Output:
 	//2.0000000000 + 2.0000000000 i
