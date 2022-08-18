@@ -14,3 +14,4 @@ The controls are specified in the game, but to reiterate:
 - Increase/decrease color contrast = P/O keys respectivly
 - Take a screenshot = space bar
 - Increase/decrease screenshot size (in relation to the game screen size) = T/R keys respectivly
+
