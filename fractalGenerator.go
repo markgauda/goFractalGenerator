@@ -27,7 +27,6 @@ import (
 	"math/big"
 	"math/cmplx"
 	"sync"
-	"time"
 )
 
 /*
@@ -197,6 +196,7 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 	var workingThreads int = getWorkingThreads(height, threads)
 	var linesToGo int = height - workingThreads
 	var py int
+	var yLines = make([]big.Float, threads)
 	for i := 0; linesToGo >= 0; i++ {
 		for j := 0; j < workingThreads; j++ {
 			//y := float64(py)/float64(height)*(ymax-ymin) + ymin
@@ -205,11 +205,14 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 			intermediateMultiplication = *intermediateMultiplication.Mul(&pyOverheight, &yMaxMinusyMin)
 			y = *y.Add(&intermediateMultiplication, &ymin)
 			fmt.Printf("out, %s ", y.Text('f', 10)) //debug
-			time.Sleep(time.Millisecond * 5)        //debug
+			yLines[j] = y
 			wg.Add(1)
-			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, y)
 			py++
 		}
+		for j := 0; j < workingThreads; j++ {
+			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, yLines[j])
+		}
+
 		fmt.Printf("\n") //debug
 		wg.Wait()
 		workingThreads = getWorkingThreads(linesToGo, threads)
