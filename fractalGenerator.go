@@ -168,7 +168,7 @@ func generateFractalLineConcurrent(x, y, scale float64, width int, height int, t
 
 func getWorkingThreads(tasks, threads int) int {
 	check := tasks % threads
-	if check == 0 {
+	if check == 0 && tasks != 0 {
 		return threads
 	} else {
 		return check
