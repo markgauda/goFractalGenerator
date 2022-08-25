@@ -185,6 +185,8 @@ func generateFractalLine(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin
 }
 
 func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float64, width int, height int, threads int) []int {
+	x.SetPrec(uint(precision))
+	y.SetPrec(uint(precision))
 	var midpoint arbPrecComplex = arbPrecComplex{x, y}
 	var yMaxMinusyMin, pyOverheight, intermediateMultiplication big.Float
 	xmin, xmax, ymin, ymax := getMinMaxArbitraryPrecision(midpoint, scale)

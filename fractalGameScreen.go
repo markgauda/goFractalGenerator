@@ -130,6 +130,13 @@ func (game *Game) Update() error {
 			arbitraryPrecision = !arbitraryPrecision
 		} else if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
 			showDebugInfo = !showDebugInfo
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyBracketLeft) {
+			if precision >= 24 {
+				precision -= 1
+			}
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyRightBracket) {
+			precision += 1
+
 		}
 	}
 
@@ -141,8 +148,8 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	//cursorX, cusrsorY := ebiten.CursorPosition()
 	if showDebugInfo {
 		ebitenutil.DebugPrint(game.offscreen, fmt.Sprintf(
-			"fractal location(x=%.16f, y=%.16f, scale=%.16f)\niterations=%d, contrast=%f, screen shot multiplier=%d\nMove = arrow keys, zoomIn/zoomOut = z/x, screenShot = spaceBar\nincrease/decrease screenshot size = t/r, increase/decrease iteration = w/q\nincrease/decrease contrast = p/o",
-			fractalData.centerX, -fractalData.centerY, fractalData.zoomScale, maxIterations, contrast, imageScale))
+			"fractal location(x=%.16f, y=%.16f, scale=%.16f)\niterations=%d, contrast=%f\nscreen shot multiplier=%d precision =%d\nMove = arrow keys, zoomIn/zoomOut = z/x, screenShot = spaceBar\nincrease/decrease screenshot size = t/r, increase/decrease iteration = w/q\nincrease/decrease contrast = p/o",
+			fractalData.centerX, -fractalData.centerY, fractalData.zoomScale, maxIterations, contrast, imageScale, precision))
 	}
 	screen.DrawImage(game.offscreen, nil)
 }

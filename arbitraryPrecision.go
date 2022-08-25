@@ -23,6 +23,8 @@ type arbPrecComplex struct {
 	imaginary big.Float
 }
 
+var precision = 53 //The level of precision for the arbitrary floating point numbers
+
 //perfomes the operation left * right aka (a+bi) * (c+di)
 func (left arbPrecComplex) multiply(right arbPrecComplex) arbPrecComplex {
 	defer func() {
