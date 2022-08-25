@@ -7,7 +7,7 @@ The goal of this project was to learn Go and to build something cool in the proc
 There are currently two implimented algorithms to generate the image data, one is concurrent the other is not. By default the concurrent algorithm is in use for the fractal viwer. The number of threads to use in the fractal generation can be specified using the -threads flag when launching the program from a terminal.
 
 The controls are specified in the game, but to reiterate:
-- F1 = toggle debug info
+- Toggle debug info = F1
 - Move = Arrow Keys
 - Zoom in = Z key
 - Zoom out = X key
