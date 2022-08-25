@@ -168,7 +168,7 @@ func generateFractalLineConcurrent(x, y, scale float64, width int, height int, t
 
 func getWorkingThreads(tasks, threads int) int {
 	check := tasks % threads
-	if check == 0 && tasks != 0 {
+	if check == 0 {
 		return threads
 	} else {
 		return check
@@ -204,13 +204,17 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 			pyOverheight.Set(big.NewFloat(float64(py) / float64(height)))
 			intermediateMultiplication = *intermediateMultiplication.Mul(&pyOverheight, &yMaxMinusyMin)
 			y = *y.Add(&intermediateMultiplication, &ymin)
-			fmt.Printf("out, %s ", y.Text('f', 10)) //debug
-			yLines[j] = y
+			fmt.Printf("out1, %s ", y.Text('f', 10)) //debug
+			yLines[j].Copy(&y)
+			for z := 0; z < j; z++ {
+				fmt.Printf("yLines[%d] =  %s ", z, yLines[z].Text('f', 10)) //debug
+			}
 			wg.Add(1)
 			py++
 		}
 		for j := 0; j < workingThreads; j++ {
-			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*py:width*(py+1)], &wg, xmin, xmax, yLines[j])
+			fmt.Printf("InyLines[%d], %s ", j, yLines[j].Text('f', 10)) //debug
+			go generateFractalLineArbitraryPrecision(width, escapeMatrix[width*(py+(j-workingThreads)):width*((py+(j-workingThreads))+1)], &wg, xmin, xmax, yLines[j])
 		}
 
 		fmt.Printf("\n") //debug
@@ -223,7 +227,7 @@ func generateFractalLineConcurrentArbitraryPrecision(x, y big.Float, scale float
 
 func generateFractalLineArbitraryPrecision(width int, escapeMatrix []int, wg *sync.WaitGroup, xmin, xmax, y big.Float) {
 	defer wg.Done()
-	//fmt.Printf("in, %s ", y.Text('f', 10)) //debug
+	fmt.Printf("in, %s ", y.Text('f', 10)) //debug
 	var xMaxMinusxMin big.Float
 	for px := 0; px < width; px++ {
 		var x big.Float
